@@ -66,7 +66,7 @@ So, if you are looking for a way to submit forms without having to convert your 
 
 ###### PT-BR
 
-Pacote em golang para trabalhar com arrays em requisições http form-data
+Pacote em golang para trabalhar com arrays em requisições http
 
 #### Instalação
 Certifique-se de que Go está instalado em seu computador.
