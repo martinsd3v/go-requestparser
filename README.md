@@ -54,7 +54,7 @@ import "github.com/martinsd3v/go-requestparser/parser"
 If you are unhappy to use long `parser`, you can do something like this:
 ```go
 import (
-  other "github.com/martinsd3v/go-requestparser/parser"
+  ps "github.com/martinsd3v/go-requestparser/parser"
 )
 ```
 
@@ -81,10 +81,10 @@ Adicione a seguinte linha em seu arquivo `*.go`:
 ```go
 import "github.com/martinsd3v/go-requestparser/parser"
 ```
-Se você não gosta de usar o `parser` longo, pode fazer algo assim:
+Se você não gostar de usar o `parser`, pode fazer algo assim:
 ```go
 import (
-  other "github.com/martinsd3v/go-requestparser/parser"
+  ps "github.com/martinsd3v/go-requestparser/parser"
 )
 ```
 
