@@ -2,6 +2,16 @@
 
 Golang package for working with arrays on http requests form-data
 
+```html
+<form method="POST" enctype="multipart/form-data">
+    <input type="text" name="User[Name]" value="Jonh">
+    <input type="text" name="User[Email]" value="Jonh@mail.com">
+    <input type="text" name="User[Pass]" value="123">
+    <input type="text" name="User[Contact][]" value="contact 1">
+    <input type="text" name="User[Contact][]" value="contact 2">
+</form>
+```
+
 #### Installation
 Make sure that Go is installed on your computer.
 Type the following command in your terminal:
