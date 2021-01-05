@@ -2,14 +2,41 @@
 
 Golang package for working with arrays on http requests form-data
 
+###### FRONT
+
 ```html
 <form method="POST" enctype="multipart/form-data">
     <input type="text" name="User[Name]" value="Jonh">
     <input type="text" name="User[Email]" value="Jonh@mail.com">
     <input type="text" name="User[Pass]" value="123">
-    <input type="text" name="User[Contact][]" value="contact 1">
-    <input type="text" name="User[Contact][]" value="contact 2">
+    <input type="text" name="User[Contact][0][Phone]" value="123456">
+    <input type="text" name="User[Contact][0][Name]" value="Mom">
+    <input type="text" name="User[Contact][1][Phone]" value="654321">
+    <input type="text" name="User[Contact][1][Name]" value="Daddy">
 </form>
+```
+
+###### BACK-END
+```go
+import "github.com/martinsd3v/go-requestparser/parser"
+
+func HandleRequest(rw http.ResponseWriter, request *http.Request) {
+	//... HandleRequest
+	var RequestDTO struct {
+		User struct {
+			Name string
+			Email string
+			Pass int
+			Contact []struct{
+				Phone string
+				Name string
+			} 
+		}
+	}
+
+	parsed := parser.Parser(request, RequestDTO)
+	//HandleRequest ...
+}
 ```
 
 #### Installation
@@ -24,10 +51,10 @@ Add following line in your `*.go` file:
 ```go
 import "github.com/martinsd3v/go-requestparser/parser"
 ```
-If you are unhappy to use long `govalidator`, you can do something like this:
+If you are unhappy to use long `parser`, you can do something like this:
 ```go
 import (
-  valid "github.com/martinsd3v/go-requestparser/parser"
+  other "github.com/martinsd3v/go-requestparser/parser"
 )
 ```
 
@@ -54,10 +81,10 @@ Adicione a seguinte linha em seu arquivo `*.go`:
 ```go
 import "github.com/martinsd3v/go-requestparser/parser"
 ```
-Se você não gosta de usar o `go-requestparser/parser` longo, pode fazer algo assim:
+Se você não gosta de usar o `parser` longo, pode fazer algo assim:
 ```go
 import (
-  valid "github.com/martinsd3v/go-requestparser/parser"
+  other "github.com/martinsd3v/go-requestparser/parser"
 )
 ```
 
