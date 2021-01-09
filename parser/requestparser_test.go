@@ -12,8 +12,8 @@ import (
 )
 
 type Data struct {
-	Name     string
-	Age      int
+	Name     string `form:"name"`
+	Age      int    `json:"age"`
 	Weigth   float32
 	Tags     []string
 	Vehicles []struct {

@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"errors"
 	"reflect"
 	"strconv"
 	"time"
@@ -24,115 +23,100 @@ func trySetValue(item reflect.Value, insert FormSlice, field string) {
 	}
 }
 
-func setWithProperType(val string, value reflect.Value, field reflect.StructField) error {
+func setWithProperType(val string, value reflect.Value, field reflect.StructField) {
 	switch value.Kind() {
 	case reflect.Int:
-		return setIntField(val, 0, value)
+		setIntField(val, 0, value)
+		return
 	case reflect.Int8:
-		return setIntField(val, 8, value)
+		setIntField(val, 8, value)
+		return
 	case reflect.Int16:
-		return setIntField(val, 16, value)
+		setIntField(val, 16, value)
+		return
 	case reflect.Int32:
-		return setIntField(val, 32, value)
+		setIntField(val, 32, value)
+		return
 	case reflect.Int64:
 		switch value.Interface().(type) {
 		case time.Duration:
-			return setTimeDuration(val, value, field)
+			setTimeDuration(val, value, field)
+			return
 		}
-		return setIntField(val, 64, value)
+		setIntField(val, 64, value)
+		return
 	case reflect.Uint:
-		return setUintField(val, 0, value)
+		setUintField(val, 0, value)
+		return
 	case reflect.Uint8:
-		return setUintField(val, 8, value)
+		setUintField(val, 8, value)
+		return
 	case reflect.Uint16:
-		return setUintField(val, 16, value)
+		setUintField(val, 16, value)
+		return
 	case reflect.Uint32:
-		return setUintField(val, 32, value)
+		setUintField(val, 32, value)
+		return
 	case reflect.Uint64:
-		return setUintField(val, 64, value)
+		setUintField(val, 64, value)
+		return
 	case reflect.Bool:
-		return setBoolField(val, value)
+		setBoolField(val, value)
+		return
 	case reflect.Float32:
-		return setFloatField(val, 32, value)
+		setFloatField(val, 32, value)
+		return
 	case reflect.Float64:
-		return setFloatField(val, 64, value)
+		setFloatField(val, 64, value)
+		return
 	case reflect.String:
 		value.SetString(val)
-	default:
-		return errors.New("Not Found Type")
 	}
-	return nil
 }
 
-func setIntField(val string, bitSize int, field reflect.Value) error {
-	if val == "" {
-		val = "0"
-	}
+func setIntField(val string, bitSize int, field reflect.Value) {
 	intVal, err := strconv.ParseInt(val, 10, bitSize)
 	if err == nil {
 		field.SetInt(intVal)
 	}
-	return err
 }
 
-func setUintField(val string, bitSize int, field reflect.Value) error {
-	if val == "" {
-		val = "0"
-	}
+func setUintField(val string, bitSize int, field reflect.Value) {
 	uintVal, err := strconv.ParseUint(val, 10, bitSize)
 	if err == nil {
 		field.SetUint(uintVal)
 	}
-	return err
 }
 
-func setBoolField(val string, field reflect.Value) error {
-	if val == "" {
-		val = "false"
-	}
+func setBoolField(val string, field reflect.Value) {
 	boolVal, err := strconv.ParseBool(val)
 	if err == nil {
 		field.SetBool(boolVal)
 	}
-	return err
 }
 
-func setFloatField(val string, bitSize int, field reflect.Value) error {
-	if val == "" {
-		val = "0.0"
-	}
+func setFloatField(val string, bitSize int, field reflect.Value) {
 	floatVal, err := strconv.ParseFloat(val, bitSize)
 	if err == nil {
 		field.SetFloat(floatVal)
 	}
-	return err
 }
 
-func setArray(vals []string, value reflect.Value, field reflect.StructField) error {
+func setArray(vals []string, value reflect.Value, field reflect.StructField) {
 	for i, s := range vals {
-		err := setWithProperType(s, value.Index(i), field)
-		if err != nil {
-			return err
-		}
+		setWithProperType(s, value.Index(i), field)
 	}
-	return nil
 }
 
-func setSlice(vals []string, value reflect.Value, field reflect.StructField) error {
+func setSlice(vals []string, value reflect.Value, field reflect.StructField) {
 	slice := reflect.MakeSlice(value.Type(), len(vals), len(vals))
-	err := setArray(vals, slice, field)
-	if err != nil {
-		return err
-	}
+	setArray(vals, slice, field)
 	value.Set(slice)
-	return nil
 }
 
-func setTimeDuration(val string, value reflect.Value, field reflect.StructField) error {
+func setTimeDuration(val string, value reflect.Value, field reflect.StructField) {
 	d, err := time.ParseDuration(val)
-	if err != nil {
-		return err
+	if err == nil {
+		value.Set(reflect.ValueOf(d))
 	}
-	value.Set(reflect.ValueOf(d))
-	return nil
 }

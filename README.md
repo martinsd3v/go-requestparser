@@ -6,7 +6,7 @@ Golang package for working with arrays on http requests
 
 ```html
 <form method="POST" enctype="multipart/form-data">
-    <input type="text" name="User[Name]" value="Jonh">
+    <input type="text" name="User[full_name]" value="Jonh Doe">
     <input type="text" name="User[Email]" value="Jonh@mail.com">
     <input type="text" name="User[Pass]" value="123">
     <input type="text" name="User[Contact][0][Phone]" value="123456">
@@ -16,7 +16,7 @@ Golang package for working with arrays on http requests
 </form>
 ```
 
-###### BACK-END
+###### BACK-END 
 ```go
 import "github.com/martinsd3v/go-requestparser/parser"
 
@@ -24,7 +24,7 @@ func HandleRequest(rw http.ResponseWriter, request *http.Request) {
 	//... HandleRequest
 	var RequestDTO struct {
 		User struct {
-			Name string
+			Name string `form:"full_name"`
 			Email string
 			Pass int
 			Contact []struct{

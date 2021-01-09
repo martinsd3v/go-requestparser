@@ -51,6 +51,14 @@ func parseEntity(vl reflect.Value, form FormSlice) {
 		for i := 0; i < elm.NumField(); i++ {
 			fieldValue := elm.Field(i)
 			field := elm.Type().Field(i).Name
+			tagField := field
+
+			//try to get custom tags
+			if tag := elm.Type().Field(i).Tag.Get("json"); tag != "" {
+				tagField = tag
+			} else if tag := elm.Type().Field(i).Tag.Get("form"); tag != "" {
+				tagField = tag
+			}
 
 			//verify field is public
 			if valid.Matches(strings.Split(field, "")[0], "[A-Z]") {
@@ -58,7 +66,7 @@ func parseEntity(vl reflect.Value, form FormSlice) {
 				if fieldValue.Kind() == reflect.Struct {
 					switch fieldValue.Interface().(type) {
 					case time.Time:
-						valueInsert := getValueInForm(field, form)
+						valueInsert := getValueInForm(tagField, form)
 						if valueInsert[field] != nil {
 							dateInsert := valueInsert[field][0]
 							valid, dt := valid.IsDate(dateInsert)
@@ -67,7 +75,7 @@ func parseEntity(vl reflect.Value, form FormSlice) {
 							}
 						}
 					default:
-						normalizedForm := normalizeFormStructs(field, form)
+						normalizedForm := normalizeFormStructs(tagField, form)
 						parseEntity(fieldValue, normalizedForm)
 					}
 				} else
@@ -76,16 +84,19 @@ func parseEntity(vl reflect.Value, form FormSlice) {
 					sliceType := elm.Type().Field(i).Type
 
 					if sliceType.Elem().Kind() == reflect.Struct {
-						sl := prepareFormStructSlices(field, sliceType, form)
+						sl := prepareFormStructSlices(tagField, sliceType, form)
 						elm.Field(i).Set(sl)
 					} else {
 						// Here is any slice
-						valueInsert := normalizeFormSimpleSlices(field, form)
+						valueInsert := normalizeFormSimpleSlices(tagField, form)
 						item := elm.Field(i)
 						trySetValue(item, valueInsert, field)
 					}
 				} else {
-					valueInsert := getValueInForm(field, form)
+					if tagField != "" {
+						field = tagField
+					}
+					valueInsert := getValueInForm(tagField, form)
 					item := elm.Field(i)
 					trySetValue(item, valueInsert, field)
 				}
@@ -99,16 +110,18 @@ type FormSlice map[string][]string
 
 //responsible for normalizing data sent in the form
 func normalizeFormStructs(key string, formIn FormSlice) FormSlice {
-	regexFind := fmt.Sprintf("(%s\\[\\w+\\])", key)
+	keyLowerCase := strings.ToLower(key)
+	regexFind := fmt.Sprintf("(%s\\[\\w+\\])", keyLowerCase)
 
 	formOut := FormSlice{}
 
 	for k := range formIn {
-		if valid.Matches(k, regexFind) {
+		keyFormLowerCase := strings.ToLower(k)
+		if valid.Matches(keyFormLowerCase, regexFind) {
 			//This is a slice
 			if valid.Matches(k, "\\[\\]$") {
-				cleanKey := valid.ReplacePattern(k, "\\[\\]$", "")
-				cleanKey = valid.ReplacePattern(cleanKey, "^"+key, "")
+				cleanKey := valid.ReplacePattern(keyFormLowerCase, "\\[\\]$", "")
+				cleanKey = valid.ReplacePattern(cleanKey, "^"+keyLowerCase, "")
 				cleanKey = valid.ReplacePattern(cleanKey, "\\]", "")
 				cleanKey = valid.ReplacePattern(cleanKey, "\\[", "&")
 				cleanKey = valid.ReplacePattern(cleanKey, "^&", "")
@@ -126,8 +139,8 @@ func normalizeFormStructs(key string, formIn FormSlice) FormSlice {
 
 			} else {
 				//This is a struct
-				cleanKey := valid.ReplacePattern(k, "\\[\\]$", "&")
-				cleanKey = valid.ReplacePattern(cleanKey, "^"+key, "")
+				cleanKey := valid.ReplacePattern(keyFormLowerCase, "\\[\\]$", "&")
+				cleanKey = valid.ReplacePattern(cleanKey, "^"+keyLowerCase, "")
 				cleanKey = valid.ReplacePattern(cleanKey, "\\]", "")
 				cleanKey = valid.ReplacePattern(cleanKey, "\\[", "&")
 				cleanKey = valid.ReplacePattern(cleanKey, "^&", "")
@@ -150,13 +163,15 @@ func normalizeFormStructs(key string, formIn FormSlice) FormSlice {
 
 //responsible for normalizing data sent in the form
 func normalizeFormSimpleSlices(key string, formIn FormSlice) FormSlice {
-	regexFind1 := fmt.Sprintf("^%s\\[\\]", key)
-	regexFind2 := fmt.Sprintf("^%s\\[\\w+\\]", key)
+	keyLowerCase := strings.ToLower(key)
+	regexFind1 := fmt.Sprintf("^%s\\[\\]", keyLowerCase)
+	regexFind2 := fmt.Sprintf("^%s\\[\\w+\\]", keyLowerCase)
 
 	formOut := FormSlice{}
 
 	for k := range formIn {
-		if valid.Matches(k, regexFind1) || valid.Matches(k, regexFind2) {
+		keyFormLowerCase := strings.ToLower(k)
+		if valid.Matches(keyFormLowerCase, regexFind1) || valid.Matches(keyFormLowerCase, regexFind2) {
 			formOut[key] = formIn[k]
 		}
 	}
@@ -165,19 +180,21 @@ func normalizeFormSimpleSlices(key string, formIn FormSlice) FormSlice {
 }
 
 func normalizeFormStructSlices(key string, formIn FormSlice) map[int]FormSlice {
+	keyLowerCase := strings.ToLower(key)
 
 	mpForm := map[int]FormSlice{}
 
 	stIndex := 0
 	mpIndex := map[string]int{}
 
-	regexFind1 := fmt.Sprintf("^%s\\[\\]", key)
-	regexFind2 := fmt.Sprintf("^%s\\[\\w+\\]", key)
+	regexFind1 := fmt.Sprintf("^%s\\[\\]", keyLowerCase)
+	regexFind2 := fmt.Sprintf("^%s\\[\\w+\\]", keyLowerCase)
 
 	for k := range formIn {
-		if valid.Matches(k, regexFind1) || valid.Matches(k, regexFind2) {
+		keyFormLowerCase := strings.ToLower(k)
+		if valid.Matches(keyFormLowerCase, regexFind1) || valid.Matches(keyFormLowerCase, regexFind2) {
 
-			cleanKey := valid.ReplacePattern(k, "\\]", "")
+			cleanKey := valid.ReplacePattern(keyFormLowerCase, "\\]", "")
 			cleanKey = valid.ReplacePattern(cleanKey, "\\[", "&")
 
 			nkeys := strings.Split(cleanKey, "&")
@@ -233,9 +250,11 @@ func prepareFormStructSlices(key string, slice reflect.Type, formIn FormSlice) r
 //responsible for taking the values passed in the form
 func getValueInForm(key string, formIn FormSlice) FormSlice {
 	formOut := FormSlice{}
+	keyLowerCase := strings.ToLower(key)
 
 	for k := range formIn {
-		if k == key {
+		keyFormLowerCase := strings.ToLower(k)
+		if keyFormLowerCase == keyLowerCase {
 			if formIn[k][0] != "" {
 				formOut[key] = formIn[k]
 			}

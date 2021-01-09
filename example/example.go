@@ -11,7 +11,7 @@ func main() {
 		//01 - Create a struct for mapping de request params
 		var RequestDTO struct {
 			User struct {
-				Name string
+				Name string `json:"full_name"`
 			}
 		}
 
