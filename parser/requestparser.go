@@ -36,7 +36,6 @@ func decodeJSON(r io.Reader, obj interface{}) (err error) {
 }
 
 func parseEntity(vl reflect.Value, form FormSlice) {
-
 	//must be a pointer
 	if vl.Kind() == reflect.Ptr || vl.Kind() == reflect.Struct {
 
@@ -130,7 +129,7 @@ func normalizeFormStructs(key string, formIn FormSlice) FormSlice {
 				indexKey := ""
 
 				if len(nkeys) > 1 {
-					indexKey = nkeys[1] + "[" + strings.Join(nkeys[2:], "][") + "][]"
+					indexKey = nkeys[0] + "[" + strings.Join(nkeys[1:], "][") + "][]"
 				} else {
 					indexKey = nkeys[0] + "[]"
 				}
@@ -146,9 +145,10 @@ func normalizeFormStructs(key string, formIn FormSlice) FormSlice {
 				cleanKey = valid.ReplacePattern(cleanKey, "^&", "")
 
 				nkeys := strings.Split(cleanKey, "&")
+
 				indexKey := ""
 				if len(nkeys) > 1 {
-					indexKey = nkeys[1] + "[" + strings.Join(nkeys[2:], "][") + "]"
+					indexKey = nkeys[0] + "[" + strings.Join(nkeys[1:], "][") + "]"
 				} else {
 					indexKey = nkeys[0]
 					indexKey = valid.ReplacePattern(indexKey, "\\[\\]", "")

@@ -86,10 +86,10 @@ func mockRequest() *http.Request {
 	form.Add("Doc[Cpf]", "756585")
 	form.Add("Doc[Tags][]", "idoc1")
 	form.Add("Doc[Tags][]", "idoc2")
-	form.Add("Doc[Cpf][Social][Number]", "756585")
-	form.Add("Doc[Cpf][Social][Tags][]", "isoc1")
-	form.Add("Doc[Cpf][Social][Tags][]", "isoc2")
-	form.Add("Doc[Cpf][Social][Tags][]", "2")
+	form.Add("Doc[Social][Number]", "756585")
+	form.Add("Doc[Social][Tags][]", "isoc1")
+	form.Add("Doc[Social][Tags][]", "isoc2")
+	form.Add("Doc[Social][Tags][]", "2")
 	form.Add("Date", "2021-05-15")
 	form.Add("SimpleTypes[Si]", "1")
 	form.Add("SimpleTypes[Si]", "1")
@@ -122,7 +122,7 @@ func mockRequest() *http.Request {
 }
 
 func mockRequest2() *http.Request {
-	json := `{"Name":"Marcelo","Age":23,"Weigth":23.58,"Tags":["dev","go"],"Vehicles":[{"Model":"Model S","Plate":"CWD4442","Brand":{"Name":"tesla"}}],"Doc":{"Cpf":"756585","Tags":["idoc1","idoc2"],"Social":{"Number":"756585","Tags":["isoc1","isoc2","2"]}},"Date":"2021-05-15T00:00:00Z","SimpleTypes":{"Si":1,"Si8":1,"Si16":1,"Si32":1,"Si64":1,"Siu":1,"Siu8":1,"Siu16":1,"Siu32":1,"Siu64":1,"Sib":false,"Sif32":1.5,"Sif64":1.5,"Sip":null,"Zeroi":0,"Zerou":0,"Zerof":0,"Nulli":0,"Nullu":0,"Nullf":0,"Nullb":false,"Duration":5000000000}}`
+	json := `{"Name":"Marcelo","age":23,"Weigth":23.58,"Tags":["dev","go"],"Vehicles":[{"Model":"Model S","Plate":"CWD4442","Brand":{"Name":"tesla"}}],"Doc":{"Cpf":"756585","Tags":["idoc1","idoc2"],"Social":{"Number":"756585","Tags":["isoc1","isoc2","2"]}},"Date":"2021-05-15T00:00:00Z","SimpleTypes":{"Si":1,"Si8":1,"Si16":1,"Si32":1,"Si64":1,"Siu":1,"Siu8":1,"Siu16":1,"Siu32":1,"Siu64":1,"Sib":false,"Sif32":1.5,"Sif64":1.5,"Sip":null,"Zeroi":0,"Zerou":0,"Zerof":0,"Nulli":0,"Nullu":0,"Nullf":0,"Nullb":false,"Duration":5000000000}}`
 	request := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(json))
 	request.Header.Set("Content-Type", "application/json")
 	return request

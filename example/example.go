@@ -10,8 +10,24 @@ func main() {
 	r.POST("/", func(c *gin.Context) {
 		//01 - Create a struct for mapping de request params
 		var RequestDTO struct {
-			User struct {
-				Name string `json:"full_name"`
+			Name     string `form:"name"`
+			Age      int    `json:"age"`
+			Weigth   float32
+			Tags     []string
+			Vehicles []struct {
+				Model string
+				Plate string
+				Brand struct {
+					Name string
+				}
+			}
+			Doc struct {
+				Cpf    string
+				Tags   []string
+				Social struct {
+					Number string
+					Tags   []string
+				}
 			}
 		}
 
