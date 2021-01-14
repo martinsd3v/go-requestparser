@@ -22,7 +22,7 @@ func Parser(request *http.Request, data interface{}) {
 			decodeJSON(request.Body, data)
 		} else {
 			vl := reflect.ValueOf(data)
-			BindValues(vl, FormSlice(request.Form))
+			bindValues(vl, FormSlice(request.Form))
 		}
 	}
 }
@@ -35,8 +35,7 @@ func decodeJSON(r io.Reader, obj interface{}) (err error) {
 	return
 }
 
-//BindValues responsable binder form on reflect values
-func BindValues(vl reflect.Value, form FormSlice) {
+func bindValues(vl reflect.Value, form FormSlice) {
 	//must be a pointer
 	if vl.Kind() == reflect.Ptr || vl.Kind() == reflect.Struct {
 
@@ -76,7 +75,7 @@ func BindValues(vl reflect.Value, form FormSlice) {
 						}
 					default:
 						normalizedForm := normalizeFormStructs(tagField, form)
-						BindValues(fieldValue, normalizedForm)
+						bindValues(fieldValue, normalizedForm)
 					}
 				} else
 				//If the type is a slice then loop and validate one by one
@@ -235,7 +234,7 @@ func prepareFormStructSlices(key string, slice reflect.Type, formIn FormSlice) r
 
 	for z := 0; z < len(mpForm); z++ {
 		nw := reflect.New(typ)
-		BindValues(nw, mpForm[z])
+		bindValues(nw, mpForm[z])
 		mpElem = append(mpElem, nw)
 	}
 
