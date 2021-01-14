@@ -22,7 +22,7 @@ func Parser(request *http.Request, data interface{}) {
 			decodeJSON(request.Body, data)
 		} else {
 			vl := reflect.ValueOf(data)
-			parseEntity(vl, FormSlice(request.Form))
+			BindValues(vl, FormSlice(request.Form))
 		}
 	}
 }
@@ -35,7 +35,8 @@ func decodeJSON(r io.Reader, obj interface{}) (err error) {
 	return
 }
 
-func parseEntity(vl reflect.Value, form FormSlice) {
+//BindValues responsable binder form in values
+func BindValues(vl reflect.Value, form FormSlice) {
 	//must be a pointer
 	if vl.Kind() == reflect.Ptr || vl.Kind() == reflect.Struct {
 
@@ -75,7 +76,7 @@ func parseEntity(vl reflect.Value, form FormSlice) {
 						}
 					default:
 						normalizedForm := normalizeFormStructs(tagField, form)
-						parseEntity(fieldValue, normalizedForm)
+						BindValues(fieldValue, normalizedForm)
 					}
 				} else
 				//If the type is a slice then loop and validate one by one
@@ -234,7 +235,7 @@ func prepareFormStructSlices(key string, slice reflect.Type, formIn FormSlice) r
 
 	for z := 0; z < len(mpForm); z++ {
 		nw := reflect.New(typ)
-		parseEntity(nw, mpForm[z])
+		BindValues(nw, mpForm[z])
 		mpElem = append(mpElem, nw)
 	}
 
