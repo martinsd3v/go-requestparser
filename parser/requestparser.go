@@ -35,7 +35,7 @@ func decodeJSON(r io.Reader, obj interface{}) (err error) {
 	return
 }
 
-//BindValues responsable binder form in values
+//BindValues responsable binder form on reflect values
 func BindValues(vl reflect.Value, form FormSlice) {
 	//must be a pointer
 	if vl.Kind() == reflect.Ptr || vl.Kind() == reflect.Struct {
